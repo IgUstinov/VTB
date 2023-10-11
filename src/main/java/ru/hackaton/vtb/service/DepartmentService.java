@@ -6,21 +6,30 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.hackaton.vtb.dto.DepartmentDto;
 import ru.hackaton.vtb.mapper.DepartmentMapper;
 import ru.hackaton.vtb.model.Department;
+import ru.hackaton.vtb.repository.DepartmentRepository;
 import ru.hackaton.vtb.repository.DepartmentServiceRepository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
 public class DepartmentService {
     private final DepartmentServiceRepository departmentServiceRepository;
+    private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
 
     @Autowired
-    public DepartmentService(DepartmentServiceRepository departmentServiceRepository, DepartmentMapper departmentMapper) {
+    public DepartmentService(DepartmentServiceRepository departmentServiceRepository, DepartmentRepository departmentRepository, DepartmentMapper departmentMapper) {
         this.departmentServiceRepository = departmentServiceRepository;
+        this.departmentRepository = departmentRepository;
         this.departmentMapper = departmentMapper;
+    }
+
+    public List<Department> findAll() {
+        System.out.println(departmentRepository.findAll());
+        return departmentRepository.findAll();
     }
 
     public List<DepartmentDto> findAll(DepartmentDto departmentDto) {
@@ -43,15 +52,11 @@ public class DepartmentService {
                         break;
                     }
                 }
-                /*if (departments != null) {
-                    //return departments;
-                }*/
             }
             if (departments == null) {
                 departments = departmentServiceRepository.findAllByServiceIdAndRadius(
                         lon, lat, rad, serviceId);
             }
-            //return departmentServiceRepository.findAllByServiceId(serviceId);
         }
         if (departments == null) {
             departments = departmentServiceRepository.findAllByRadius(
@@ -61,12 +66,30 @@ public class DepartmentService {
         return departments.stream()
                 .map((department -> departmentMapper.toDto(department, departmentDto, finalMinWorkLoad)))
                 .collect(Collectors.toList());
-        /*return departmentServiceRepository.findAllByLongitudeBetweenAndLatitudeBetween(lon+rad.doubleValue(),
-                lon-rad.doubleValue(), lat+rad.doubleValue(), lat-rad.doubleValue());*/
+    }
+
+    @Transactional
+    public void save(Department department) {
+        departmentRepository.save(department);
+    }
+
+    public Department findById(int id) {
+        Optional<Department> foundCar = departmentRepository.findById(id);
+        return foundCar.orElse(null);
+    }
+
+    @Transactional
+    public void updateDepartmentById(Integer id, Department newDepartment) {
+        Department updatedDepartment = this.findById(id);
+        updatedDepartment.setDepartment(newDepartment.getDepartment());
+        updatedDepartment.setLongitude(newDepartment.getLongitude());
+        updatedDepartment.setLatitude(newDepartment.getLatitude());
+        departmentRepository.save(updatedDepartment);
+    }
+
+    @Transactional
+    public void deleteDepartmentById(Integer id) {
+        Department department = this.findById(id);
+        departmentRepository.delete(department);
     }
 }
-/*
-departmentRepository.findAllByLongitudeBetweenAndLatitudeBetween(lon+rad.doubleValue(),
-lon-rad.doubleValue(), lat+rad.doubleValue(), lat-rad.doubleValue());
-*/
-//return departmentRepository.findAll();

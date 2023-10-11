@@ -3,6 +3,7 @@ package ru.hackaton.vtb.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.hackaton.vtb.dto.DepartmentDto;
 import ru.hackaton.vtb.model.Department;
@@ -26,5 +27,27 @@ public class DepartmentController {
         return new ResponseEntity<>(departmentService.findAll(departmentDto), HttpStatus.OK);
     }
 
+    @GetMapping("/read")
+    public ResponseEntity<List<Department>> readAllDepartments() {
+        return new ResponseEntity<>(departmentService.findAll(), HttpStatus.OK);
+    }
 
+    @PostMapping("/create")
+    public ResponseEntity<HttpStatus> createDepartment(@RequestBody Department department) {
+        departmentService.save(department);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<HttpStatus> updateDepartmentCarById(@PathVariable("id") Integer id,
+                                                          @RequestBody Department department) {
+        departmentService.updateDepartmentById(id, department);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<HttpStatus> deleteDepartmentById(@PathVariable("id") int id) {
+        departmentService.deleteDepartmentById(id);
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
 }
