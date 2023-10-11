@@ -2,6 +2,7 @@ package ru.hackaton.vtb.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import ru.hackaton.vtb.model.Department;
 import ru.hackaton.vtb.model.Service;
 import ru.hackaton.vtb.repository.ServiceRepository;
 import ru.hackaton.vtb.util.ServiceNotFoundException;
@@ -25,14 +26,15 @@ public class ServiceService {
     }
 
     @Transactional
-    public void delete(int id) {
-        getById(id);
-        serviceRepository.deleteById(id);
+    public void deleteServiceById (int id) {
+        Service service = this.findById(id);
+        serviceRepository.delete(service);
     }
 
     @Transactional
-    public void update(Service updateService) {
-        getById(updateService.getId());
+    public void updateServiceById(Integer id, Service updateService) {
+        Service newService = this.findById(id);
+        newService.setService(updateService.getService());
         serviceRepository.save(updateService);
     }
 
@@ -40,7 +42,7 @@ public class ServiceService {
         return serviceRepository.findAll();
     }
 
-    public Service getById(int id) {
+    public Service findById(int id) {
         Optional<Service> service = serviceRepository.findById(id);
         return service.orElseThrow(ServiceNotFoundException::new);
     }

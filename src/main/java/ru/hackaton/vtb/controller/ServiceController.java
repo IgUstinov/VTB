@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hackaton.vtb.model.Department;
 import ru.hackaton.vtb.model.Service;
 import ru.hackaton.vtb.service.ServiceService;
 
@@ -11,8 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/service")
 public class ServiceController {
-    //внедряем сервис и маппер (для преобразования DTO в модель и обратно)
     private final ServiceService serviceService;
 
     @Autowired
@@ -20,35 +21,35 @@ public class ServiceController {
         this.serviceService = serviceService;
     }
 
-    //метод возвращает список всех атворов
-    @GetMapping("/services")
-    public List<Service> getAuthors() {
+    @GetMapping("/read")
+    public List<Service> readAllServices() {
         return new ArrayList<>(serviceService.findAll());
     }
 
     //метод возвращает автора по id
-    @GetMapping("/service/{id}")
-    public Service getAuthor(@PathVariable("id") int id) {
-        return serviceService.getById(id);
+    @GetMapping("/{id}")
+    public Service getServiceById (@PathVariable("id") int id) {
+        return serviceService.findById(id);
     }
 
     //метод удаляет автора по id
-    @DeleteMapping("/service/{id}")
-    public ResponseEntity<HttpStatus> deleteAuthor(@PathVariable int id) {
-        serviceService.delete(id);
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<HttpStatus> deleteServiceById (@PathVariable int id) {
+        serviceService.deleteServiceById(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     //метод создания автора
-    @PostMapping("/service")
-    public ResponseEntity<HttpStatus> createAuthor(@RequestBody Service service) {
+    @PostMapping("/create")
+    public ResponseEntity<HttpStatus> createService(@RequestBody Service service) {
         serviceService.save(service);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    @PatchMapping("/service")
-    public ResponseEntity<HttpStatus> updateAuthor(@RequestBody Service service) {
-        serviceService.update(service);
+    @PatchMapping("/update/{id}")
+    public ResponseEntity<HttpStatus> updateServiceById (@PathVariable("id") Integer id,
+                                                    @RequestBody Service service) {
+        serviceService.updateServiceById(id, service);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }
