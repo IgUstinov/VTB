@@ -3,10 +3,8 @@ package ru.hackaton.vtb.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.hackaton.vtb.dto.DepartmentDto;
 import ru.hackaton.vtb.model.Department;
 import ru.hackaton.vtb.service.DepartmentService;
 
@@ -23,8 +21,10 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<Department>> getAllCars() {
-        return new ResponseEntity<>(departmentService.findAll(), HttpStatus.OK);
+    @PostMapping("")
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments(@RequestBody DepartmentDto departmentDto) {
+        return new ResponseEntity<>(departmentService.findAll(departmentDto), HttpStatus.OK);
     }
+
+
 }
