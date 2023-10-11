@@ -1,8 +1,16 @@
 package ru.hackaton.vtb.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "department_service")
 public class DepartmentService {
     @Id
@@ -20,37 +28,4 @@ public class DepartmentService {
 
     @Column(name = "workload", nullable = false)
     private Double workload;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Department getDepartment() {
-        return department;
-    }
-
-    public void setDepartment(Department department) {
-        this.department = department;
-    }
-
-    public Service getService() {
-        return service;
-    }
-
-    public void setService(Service service) {
-        this.service = service;
-    }
-
-    public Double getWorkload() {
-        return workload;
-    }
-
-    public void setWorkload(Double workload) {
-        this.workload = workload;
-    }
-
 }

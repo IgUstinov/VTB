@@ -37,13 +37,11 @@ public class DepartmentService {
         Double lat = departmentDto.getLatitude();
         Integer rad = departmentDto.getRadius();
         Integer serviceId = departmentDto.getServiceId();
-        Double workload = departmentDto.getWorkload();
         Boolean work = departmentDto.getAccountWorkload();
         List<Department> departments = null;
         int minWorkLoad = 0;
         if (serviceId != 0) {
             if (work) {
-                minWorkLoad = 1;
                 for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
                     departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(
                             lon, lat, rad, serviceId, (double) minWorkLoad);

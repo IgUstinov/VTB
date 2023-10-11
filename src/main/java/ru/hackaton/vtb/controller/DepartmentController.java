@@ -6,10 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hackaton.vtb.dto.DepartmentDto;
 import ru.hackaton.vtb.model.Department;
-import ru.hackaton.vtb.model.Service;
 import ru.hackaton.vtb.service.DepartmentService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -28,10 +26,6 @@ public class DepartmentController {
         return new ResponseEntity<>(departmentService.findAllByDto(departmentDto), HttpStatus.OK);
     }
 
-    /*@GetMapping("/read")
-    public ResponseEntity<List<Department>> readAllDepartments() {
-        return new ResponseEntity<>(departmentService.findAll(), HttpStatus.OK);
-    }*/
     @GetMapping("/read")
     public ResponseEntity<List<Department>> readAllDepartments() {
         return new ResponseEntity<>(departmentService.findAll(), HttpStatus.OK);

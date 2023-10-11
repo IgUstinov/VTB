@@ -2,11 +2,19 @@ package ru.hackaton.vtb.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "service")
 public class Service {
     @Id
@@ -20,29 +28,5 @@ public class Service {
     @JsonIgnore
     @OneToMany(mappedBy = "service")
     private Set<DepartmentService> departmentServices = new LinkedHashSet<>();
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getService() {
-        return service;
-    }
-
-    public void setService(String service) {
-        this.service = service;
-    }
-
-    public Set<DepartmentService> getDepartmentServices() {
-        return departmentServices;
-    }
-
-    public void setDepartmentServices(Set<DepartmentService> departmentServices) {
-        this.departmentServices = departmentServices;
-    }
 
 }

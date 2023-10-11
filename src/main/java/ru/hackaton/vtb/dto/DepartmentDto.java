@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * DTO for {@link ru.hackaton.vtb.model.Department}
