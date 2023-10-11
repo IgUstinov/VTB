@@ -3,12 +3,13 @@ package ru.hackaton.vtb.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.hackaton.vtb.dto.DepartmentDto;
 import ru.hackaton.vtb.model.Department;
+import ru.hackaton.vtb.model.Service;
 import ru.hackaton.vtb.service.DepartmentService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,10 +24,14 @@ public class DepartmentController {
     }
 
     @PostMapping("")
-    public ResponseEntity<List<DepartmentDto>> getAllDepartments(@RequestBody DepartmentDto departmentDto) {
-        return new ResponseEntity<>(departmentService.findAll(departmentDto), HttpStatus.OK);
+    public ResponseEntity<List<DepartmentDto>> readAllDepartmentsByDto(@RequestBody DepartmentDto departmentDto) {
+        return new ResponseEntity<>(departmentService.findAllByDto(departmentDto), HttpStatus.OK);
     }
 
+    /*@GetMapping("/read")
+    public ResponseEntity<List<Department>> readAllDepartments() {
+        return new ResponseEntity<>(departmentService.findAll(), HttpStatus.OK);
+    }*/
     @GetMapping("/read")
     public ResponseEntity<List<Department>> readAllDepartments() {
         return new ResponseEntity<>(departmentService.findAll(), HttpStatus.OK);
@@ -39,7 +44,7 @@ public class DepartmentController {
     }
 
     @PatchMapping("/update/{id}")
-    public ResponseEntity<HttpStatus> updateDepartmentCarById(@PathVariable("id") Integer id,
+    public ResponseEntity<HttpStatus> updateDepartmentById(@PathVariable("id") Integer id,
                                                           @RequestBody Department department) {
         departmentService.updateDepartmentById(id, department);
         return ResponseEntity.ok(HttpStatus.OK);

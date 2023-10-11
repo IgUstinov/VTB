@@ -1,5 +1,6 @@
 package ru.hackaton.vtb.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.LinkedHashSet;
@@ -16,6 +17,7 @@ public class Service {
     @Column(name = "service", nullable = false, length = 100)
     private String service;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "service")
     private Set<DepartmentService> departmentServices = new LinkedHashSet<>();
 

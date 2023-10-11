@@ -22,14 +22,14 @@ public class ServiceController {
     }
 
     @GetMapping("/read")
-    public List<Service> readAllServices() {
-        return new ArrayList<>(serviceService.findAll());
+    public ResponseEntity<List<Service>> readAllServices() {
+        return new ResponseEntity<>(serviceService.findAll(), HttpStatus.OK);
     }
 
     //метод возвращает автора по id
     @GetMapping("/{id}")
-    public Service getServiceById (@PathVariable("id") int id) {
-        return serviceService.findById(id);
+    public ResponseEntity<Service> getServiceById (@PathVariable("id") int id) {
+        return new ResponseEntity<>(serviceService.findById(id), HttpStatus.OK);
     }
 
     //метод удаляет автора по id

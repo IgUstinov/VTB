@@ -28,11 +28,10 @@ public class DepartmentService {
     }
 
     public List<Department> findAll() {
-        System.out.println(departmentRepository.findAll());
         return departmentRepository.findAll();
     }
 
-    public List<DepartmentDto> findAll(DepartmentDto departmentDto) {
+    public List<DepartmentDto> findAllByDto(DepartmentDto departmentDto) {
         System.out.println(departmentDto);
         Double lon = departmentDto.getLongitude();
         Double lat = departmentDto.getLatitude();
@@ -74,8 +73,8 @@ public class DepartmentService {
     }
 
     public Department findById(int id) {
-        Optional<Department> foundCar = departmentRepository.findById(id);
-        return foundCar.orElse(null);
+        Optional<Department> foundDepartment = departmentRepository.findById(id);
+        return foundDepartment.orElse(null);
     }
 
     @Transactional
