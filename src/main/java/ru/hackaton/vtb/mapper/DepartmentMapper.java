@@ -10,7 +10,7 @@ public class DepartmentMapper {
 
     public DepartmentDto toDto(Department department, DepartmentDto departmentDto, int minWorkLoad) {
         return DepartmentDto.builder()
-                .serviceId(departmentDto.getServiceId())
+                .service(departmentDto.getService())
                 .accountWorkload(departmentDto.getAccountWorkload())
                 .radius(departmentDto.getRadius())
                 .workload((double)minWorkLoad)

@@ -8,6 +8,8 @@ import ru.hackaton.vtb.mapper.DepartmentMapper;
 import ru.hackaton.vtb.model.Department;
 import ru.hackaton.vtb.repository.DepartmentRepository;
 import ru.hackaton.vtb.repository.DepartmentServiceRepository;
+import ru.hackaton.vtb.repository.ServiceRepository;
+import ru.hackaton.vtb.util.ServiceNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,12 +20,14 @@ import java.util.stream.Collectors;
 public class DepartmentService {
     private final DepartmentServiceRepository departmentServiceRepository;
     private final DepartmentRepository departmentRepository;
+    private final ServiceRepository serviceRepository;
     private final DepartmentMapper departmentMapper;
 
     @Autowired
-    public DepartmentService(DepartmentServiceRepository departmentServiceRepository, DepartmentRepository departmentRepository, DepartmentMapper departmentMapper) {
+    public DepartmentService(DepartmentServiceRepository departmentServiceRepository, DepartmentRepository departmentRepository, ServiceRepository serviceRepository, ServiceRepository serviceRepository1, DepartmentMapper departmentMapper) {
         this.departmentServiceRepository = departmentServiceRepository;
         this.departmentRepository = departmentRepository;
+        this.serviceRepository = serviceRepository1;
         this.departmentMapper = departmentMapper;
     }
 
@@ -36,11 +40,14 @@ public class DepartmentService {
         Double lon = departmentDto.getLongitude();
         Double lat = departmentDto.getLatitude();
         Integer rad = departmentDto.getRadius();
-        Integer serviceId = departmentDto.getServiceId();
+        ru.hackaton.vtb.model.Service service = departmentDto.getService();
         Boolean work = departmentDto.getAccountWorkload();
         List<Department> departments = null;
         int minWorkLoad = 0;
-        if (serviceId != 0) {
+        if (service != null) {
+            int serviceId = service.getId();
+            if (!serviceRepository.findById(serviceId).isPresent()) throw new ServiceNotFoundException();
+
             if (work) {
                 for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
                     departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(
