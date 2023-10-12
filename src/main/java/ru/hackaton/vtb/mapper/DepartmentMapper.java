@@ -3,6 +3,7 @@ package ru.hackaton.vtb.mapper;
 import org.springframework.stereotype.Component;
 import ru.hackaton.vtb.dto.DepartmentDto;
 import ru.hackaton.vtb.model.Department;
+import ru.hackaton.vtb.model.DepartmentService;
 
 @Component
 public class DepartmentMapper {

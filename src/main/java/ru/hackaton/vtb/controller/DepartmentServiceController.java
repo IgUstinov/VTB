@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hackaton.vtb.dto.DepartmentServiceDTO;
 import ru.hackaton.vtb.model.DepartmentService;
 import ru.hackaton.vtb.service.DepartmentServiceService;
 
@@ -21,13 +22,13 @@ public class DepartmentServiceController {
     }
 
     @GetMapping("/read")
-    public List<DepartmentService> readAllDepartmentServices() {
+    public List<DepartmentServiceDTO> readAllDepartmentServices() {
         return new ArrayList<>(departmentServiceService.findAll());
     }
 
     //метод возвращает автора по id
     @GetMapping("/{id}")
-    public DepartmentService getDepartmentServiceById (@PathVariable("id") int id) {
+    public DepartmentServiceDTO getDepartmentServiceById (@PathVariable("id") int id) {
         return departmentServiceService.findById(id);
     }
 
@@ -40,15 +41,15 @@ public class DepartmentServiceController {
 
     //метод создания автора
     @PostMapping("/create")
-    public ResponseEntity<HttpStatus> createService(@RequestBody DepartmentService departmentService) {
-        departmentServiceService.save(departmentService);
+    public ResponseEntity<HttpStatus> createService(@RequestBody DepartmentServiceDTO departmentServiceDTO) {
+        departmentServiceService.save(departmentServiceDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @PatchMapping("/update/{id}")
     public ResponseEntity<HttpStatus> updateServiceById (@PathVariable("id") Integer id,
-                                                         @RequestBody DepartmentService departmentService) {
-        departmentServiceService.updateDepartmentServiceById(id, departmentService);
+                                                         @RequestBody DepartmentServiceDTO departmentServiceDTO) {
+        departmentServiceService.updateDepartmentServiceById(id, departmentServiceDTO);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 }
