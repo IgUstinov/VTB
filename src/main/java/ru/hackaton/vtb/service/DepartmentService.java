@@ -20,14 +20,12 @@ import java.util.stream.Collectors;
 public class DepartmentService {
     private final DepartmentServiceRepository departmentServiceRepository;
     private final DepartmentRepository departmentRepository;
-    private final ServiceRepository serviceRepository;
     private final DepartmentMapper departmentMapper;
 
     @Autowired
-    public DepartmentService(DepartmentServiceRepository departmentServiceRepository, DepartmentRepository departmentRepository, ServiceRepository serviceRepository, ServiceRepository serviceRepository1, DepartmentMapper departmentMapper) {
+    public DepartmentService(DepartmentServiceRepository departmentServiceRepository, DepartmentRepository departmentRepository, ServiceRepository serviceRepository1, DepartmentMapper departmentMapper) {
         this.departmentServiceRepository = departmentServiceRepository;
         this.departmentRepository = departmentRepository;
-        this.serviceRepository = serviceRepository1;
         this.departmentMapper = departmentMapper;
     }
 
@@ -40,18 +38,15 @@ public class DepartmentService {
         Double lon = departmentDto.getLongitude();
         Double lat = departmentDto.getLatitude();
         Integer rad = departmentDto.getRadius();
-        ru.hackaton.vtb.model.Service service = departmentDto.getService();
+        List<Integer> services = departmentDto.getService();
         Boolean work = departmentDto.getAccountWorkload();
         List<Department> departments = null;
         int minWorkLoad = 0;
-        if (service != null) {
-            int serviceId = service.getId();
-            if (!serviceRepository.findById(serviceId).isPresent()) throw new ServiceNotFoundException();
-
+        if (services != null) {
             if (work) {
                 for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
                     departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(
-                            lon, lat, rad, serviceId, (double) minWorkLoad);
+                            lon, lat, rad, services.get(0), (double) minWorkLoad);
                     if (departments != null) {
                         break;
                     }
@@ -59,12 +54,13 @@ public class DepartmentService {
             }
             if (departments == null) {
                 departments = departmentServiceRepository.findAllByServiceIdAndRadius(
-                        lon, lat, rad, serviceId);
+                        lon, lat, rad, services.get(0));
             }
         }
         if (departments == null) {
             departments = departmentServiceRepository.findAllByRadius(
                     lon, lat, rad);
+//            departments.stream().forEach(x -> x.getDepartmentServices().forEach(y -> y.getService().getId()));
         }
         int finalMinWorkLoad = minWorkLoad;
         return departments.stream()
