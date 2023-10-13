@@ -11,6 +11,7 @@ import ru.hackaton.vtb.repository.DepartmentServiceRepository;
 import ru.hackaton.vtb.repository.ServiceRepository;
 import ru.hackaton.vtb.util.ServiceNotFoundException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class DepartmentService {
         Boolean work = departmentDto.getAccountWorkload();
         List<Department> departments = null;
         int minWorkLoad = 0;
-        if (services != null) {
+        if (services.get(0) != 0) {
             if (work) {
                 for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
                     departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(
@@ -60,7 +61,13 @@ public class DepartmentService {
         if (departments == null) {
             departments = departmentServiceRepository.findAllByRadius(
                     lon, lat, rad);
-//            departments.stream().forEach(x -> x.getDepartmentServices().forEach(y -> y.getService().getId()));
+            return departments.stream().map(department -> {
+                List<Integer> servicesList = new ArrayList<>();
+                department.getDepartmentServices().forEach(service -> {
+                    servicesList.add(service.getService().getId());
+                });
+                return departmentMapper.toDto(department, departmentDto, 0, servicesList);
+            }).collect(Collectors.toList());
         }
         int finalMinWorkLoad = minWorkLoad;
         return departments.stream()
