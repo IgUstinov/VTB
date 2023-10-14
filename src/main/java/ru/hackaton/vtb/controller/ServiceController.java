@@ -24,20 +24,17 @@ public class ServiceController {
         return new ResponseEntity<>(serviceService.findAll(), HttpStatus.OK);
     }
 
-    //метод возвращает автора по id
     @GetMapping("/{id}")
     public ResponseEntity<Service> getServiceById (@PathVariable("id") int id) {
         return new ResponseEntity<>(serviceService.findById(id), HttpStatus.OK);
     }
 
-    //метод удаляет автора по id
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpStatus> deleteServiceById (@PathVariable int id) {
         serviceService.deleteServiceById(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    //метод создания автора
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createService(@RequestBody Service service) {
         serviceService.save(service);

@@ -26,20 +26,17 @@ public class DepartmentServiceController {
         return new ArrayList<>(departmentServiceService.findAll());
     }
 
-    //метод возвращает автора по id
     @GetMapping("/{id}")
     public DepartmentServiceDTO getDepartmentServiceById (@PathVariable("id") int id) {
         return departmentServiceService.findById(id);
     }
 
-    //метод удаляет автора по id
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<HttpStatus> deleteServiceById (@PathVariable int id) {
         departmentServiceService.deleteDepartmentServiceById(id);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
-    //метод создания автора
     @PostMapping("/create")
     public ResponseEntity<HttpStatus> createService(@RequestBody DepartmentServiceDTO departmentServiceDTO) {
         departmentServiceService.save(departmentServiceDTO);

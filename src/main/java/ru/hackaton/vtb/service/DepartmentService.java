@@ -43,26 +43,59 @@ public class DepartmentService {
         Integer rad = departmentDto.getRadius();
         List<Integer> services = departmentDto.getService();
         Boolean work = departmentDto.getAccountWorkload();
+        String search = departmentDto.getSearch();
+        search = (search != null && departmentDto.getSearch().trim().length() > 2) ? search.trim() : null;
+        System.out.println(search);
         List<Department> departments = null;
         int minWorkLoad = 0;
-        if (services != null && services.get(0) != 0) {
+        if (services != null && !services.isEmpty() && services.get(0) != 0) {
             if (work) {
                 for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
-                    departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(
-                            lon, lat, rad, services.get(0), (double) minWorkLoad);
+                    //departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(lon, lat, rad, services.get(0), (double) minWorkLoad);
+                    departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), (double) minWorkLoad, search);
+                    /*if (!search.isEmpty()) {
+                        departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), (double) minWorkLoad, search);
+                    }*/
                     if (departments != null) {
                         break;
                     }
                 }
             }
             if (departments == null) {
-                departments = departmentServiceRepository.findAllByServiceIdAndRadius(
-                        lon, lat, rad, services.get(0));
+                //departments = departmentServiceRepository.findAllByServiceIdAndRadius(lon, lat, rad, services.get(0));
+                departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), null, search);
+                return departments.stream()
+                        .filter(department -> {
+                            List<Integer> servicesList = new ArrayList<>();
+                            department.getDepartmentServices().forEach(service -> {
+                                if (services.contains(service.getService().getId())) {
+                                    servicesList.add(service.getService().getId());
+                                }
+                            });
+                            return servicesList.size() == services.size();
+                        })
+                        .map(department -> {
+                    List<Double> servicesWorkloadList = new ArrayList<>();
+                    List<Integer> servicesList = new ArrayList<>();
+                    department.getDepartmentServices().forEach(service -> {
+                        if (services.contains(service.getService().getId())) {
+                            servicesWorkloadList.add(service.getWorkload());
+                            servicesList.add(service.getService().getId());
+                        }
+                    });
+                    OptionalDouble workload = servicesWorkloadList.stream().mapToDouble(e -> e).average();
+                    if (workload.isPresent()) {
+                        return departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList);
+                    } else {
+                        return departmentMapper.toDto(department, departmentDto, 0, servicesList);
+                    }
+                    //return departmentMapper.toDto(department, departmentDto, 0, services);
+                }).collect(Collectors.toList());
             }
         }
         if (departments == null) {
-            departments = departmentServiceRepository.findAllByRadius(
-                    lon, lat, rad);
+            //departments = departmentServiceRepository.findAllByRadius(lon, lat, rad);
+            departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, null, null, search);
             return departments.stream().map(department -> {
                 List<Integer> servicesList = new ArrayList<>();
                 List<Double> servicesWorkloadList = new ArrayList<>();

@@ -24,4 +24,6 @@ public class DepartmentDto implements Serializable {
     private Double workload;
     private Integer radius;
     private Boolean accountWorkload;
+
+    private String search;
 }
