@@ -9,12 +9,14 @@ import ru.hackaton.vtb.model.Department;
 import ru.hackaton.vtb.repository.DepartmentRepository;
 import ru.hackaton.vtb.repository.DepartmentServiceRepository;
 import ru.hackaton.vtb.repository.ServiceRepository;
-import ru.hackaton.vtb.util.ServiceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,7 +45,7 @@ public class DepartmentService {
         Boolean work = departmentDto.getAccountWorkload();
         List<Department> departments = null;
         int minWorkLoad = 0;
-        if (services.get(0) != 0 && services.size() == 1) {
+        if (services != null && services.get(0) != 0) {
             if (work) {
                 for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
                     departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(
@@ -63,10 +65,23 @@ public class DepartmentService {
                     lon, lat, rad);
             return departments.stream().map(department -> {
                 List<Integer> servicesList = new ArrayList<>();
+                List<Double> servicesWorkloadList = new ArrayList<>();
                 department.getDepartmentServices().forEach(service -> {
                     servicesList.add(service.getService().getId());
+                    servicesWorkloadList.add(service.getWorkload());
                 });
-                return departmentMapper.toDto(department, departmentDto, 0, servicesList);
+                OptionalDouble workload = servicesWorkloadList.stream().mapToDouble(e -> e).average();
+                if (workload.isPresent()) {
+                    System.out.println(
+                            departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList).getDepartment()
+                    );
+                    System.out.println(
+                            departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList).getWorkload()
+                    );
+                    return departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList);
+                } else {
+                    return departmentMapper.toDto(department, departmentDto, 0, servicesList);
+                }
             }).collect(Collectors.toList());
         }
         int finalMinWorkLoad = minWorkLoad;

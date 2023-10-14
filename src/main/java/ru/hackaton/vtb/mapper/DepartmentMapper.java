@@ -21,7 +21,7 @@ public class DepartmentMapper {
                 .latitude(department.getLatitude())
                 .build();
     }
-    public DepartmentDto toDto(Department department, DepartmentDto departmentDto, int minWorkLoad, List<Integer> services) {
+    public DepartmentDto toDto(Department department, DepartmentDto departmentDto, double minWorkLoad, List<Integer> services) {
         return DepartmentDto.builder()
                 .service(services)
                 .accountWorkload(departmentDto.getAccountWorkload())
