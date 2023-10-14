@@ -43,7 +43,7 @@ public class DepartmentService {
         Boolean work = departmentDto.getAccountWorkload();
         List<Department> departments = null;
         int minWorkLoad = 0;
-        if (services.get(0) != 0) {
+        if (services.get(0) != 0 && services.size() == 1) {
             if (work) {
                 for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
                     departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(
