@@ -10,10 +10,7 @@ import ru.hackaton.vtb.repository.DepartmentRepository;
 import ru.hackaton.vtb.repository.DepartmentServiceRepository;
 import ru.hackaton.vtb.repository.ServiceRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
@@ -43,44 +40,28 @@ public class DepartmentService {
         Integer rad = departmentDto.getRadius();
         List<Integer> services = departmentDto.getService();
         Boolean work = departmentDto.getAccountWorkload();
-        String search = departmentDto.getSearch();
-        search = (search != null && departmentDto.getSearch().trim().length() > 2) ? search.trim() : null;
-        System.out.println(search);
         List<Department> departments = null;
-        int minWorkLoad = 0;
+        final int[] minWorkLoad = {0};
         if (services != null && !services.isEmpty() && services.get(0) != 0) {
             if (work) {
-                for (minWorkLoad = 1; minWorkLoad < 5; minWorkLoad++) {
-                    //departments = departmentServiceRepository.findAllByServiceIdAndWorkloadLessThanEqualAndRadius(lon, lat, rad, services.get(0), (double) minWorkLoad);
-                    departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), (double) minWorkLoad, search);
-                    /*if (!search.isEmpty()) {
-                        departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), (double) minWorkLoad, search);
-                    }*/
-                    if (departments != null) {
+                for (minWorkLoad[0] = 1; minWorkLoad[0] <= 5; minWorkLoad[0]++) {
+                    departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), (double) minWorkLoad[0]);
+                    System.out.println(minWorkLoad[0]);
+                    System.out.println(departments != null);
+                    if (departments != null && !departments.isEmpty()) {
                         break;
                     }
                 }
-            }
-            if (departments == null) {
-                //departments = departmentServiceRepository.findAllByServiceIdAndRadius(lon, lat, rad, services.get(0));
-                departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), null, search);
-                return departments.stream()
-                        .filter(department -> {
-                            List<Integer> servicesList = new ArrayList<>();
-                            department.getDepartmentServices().forEach(service -> {
-                                if (services.contains(service.getService().getId())) {
-                                    servicesList.add(service.getService().getId());
-                                }
-                            });
-                            return servicesList.size() == services.size();
-                        })
-                        .map(department -> {
+                if (departments == null || departments.isEmpty()) {
+                    departments = new ArrayList<>();
+                }
+                return departments.stream().map(department -> {
                     List<Double> servicesWorkloadList = new ArrayList<>();
                     List<Integer> servicesList = new ArrayList<>();
                     department.getDepartmentServices().forEach(service -> {
+                        servicesList.add(service.getService().getId());
                         if (services.contains(service.getService().getId())) {
                             servicesWorkloadList.add(service.getWorkload());
-                            servicesList.add(service.getService().getId());
                         }
                     });
                     OptionalDouble workload = servicesWorkloadList.stream().mapToDouble(e -> e).average();
@@ -89,38 +70,96 @@ public class DepartmentService {
                     } else {
                         return departmentMapper.toDto(department, departmentDto, 0, servicesList);
                     }
-                    //return departmentMapper.toDto(department, departmentDto, 0, services);
                 }).collect(Collectors.toList());
             }
-        }
-        if (departments == null) {
-            //departments = departmentServiceRepository.findAllByRadius(lon, lat, rad);
-            departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, null, null, search);
-            return departments.stream().map(department -> {
-                List<Integer> servicesList = new ArrayList<>();
+            departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, services.get(0), null);
+            return departments.stream()
+                    .filter(department -> {
+                        List<Integer> servicesList = new ArrayList<>();
+                        department.getDepartmentServices().forEach(service -> {
+                            if (services.contains(service.getService().getId())) {
+                                servicesList.add(service.getService().getId());
+                            }
+                        });
+                        return servicesList.size() == services.size();
+                    })
+                    .map(department -> {
                 List<Double> servicesWorkloadList = new ArrayList<>();
+                List<Integer> servicesList = new ArrayList<>();
                 department.getDepartmentServices().forEach(service -> {
                     servicesList.add(service.getService().getId());
+                    if (services.contains(service.getService().getId())) {
+                        servicesWorkloadList.add(service.getWorkload());
+                    }
+                });
+                OptionalDouble workload = servicesWorkloadList.stream().mapToDouble(e -> e).average();
+                if (workload.isPresent()) {
+                    return departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList);
+                } else {
+                    return departmentMapper.toDto(department, departmentDto, 0, servicesList);
+                }
+            }).collect(Collectors.toList());
+        } else if (work) {
+            departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, null, null);
+            final Integer[] minWorkLoad_output = {5};
+            departments.forEach(department -> {
+                department.getDepartmentServices().forEach(service -> {
+                   if (service.getWorkload() < minWorkLoad_output[0]) {
+                       minWorkLoad_output[0] = service.getWorkload().intValue();
+                   }
+                });
+            });
+            departments = departments.stream().filter(department -> {
+                List<Double> servicesWorkloadList = new ArrayList<>();
+                department.getDepartmentServices().forEach(service -> {
                     servicesWorkloadList.add(service.getWorkload());
                 });
                 OptionalDouble workload = servicesWorkloadList.stream().mapToDouble(e -> e).average();
                 if (workload.isPresent()) {
-                    System.out.println(
-                            departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList).getDepartment()
-                    );
-                    System.out.println(
-                            departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList).getWorkload()
-                    );
+                    return  workload.getAsDouble() <= minWorkLoad_output[0];
+                } else {
+                    return false;
+                }
+            }).collect(Collectors.toList());
+            if (departments.isEmpty()) {
+                departments = new ArrayList<>();
+            }
+            return departments.stream().map(department -> {
+                List<Double> servicesWorkloadList = new ArrayList<>();
+                List<Integer> servicesList = new ArrayList<>();
+                department.getDepartmentServices().forEach(service -> {
+                    servicesWorkloadList.add(service.getWorkload());
+                    servicesList.add(service.getService().getId());
+                });
+                OptionalDouble workload = servicesWorkloadList.stream().mapToDouble(e -> e).average();
+                if (workload.isPresent()) {
                     return departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList);
                 } else {
                     return departmentMapper.toDto(department, departmentDto, 0, servicesList);
                 }
             }).collect(Collectors.toList());
         }
-        int finalMinWorkLoad = minWorkLoad;
-        return departments.stream()
-                .map((department -> departmentMapper.toDto(department, departmentDto, finalMinWorkLoad)))
-                .collect(Collectors.toList());
+        departments = departmentServiceRepository.findAllByParameters(lon, lat, rad, null, null);
+        return departments.stream().map(department -> {
+            List<Integer> servicesList = new ArrayList<>();
+            List<Double> servicesWorkloadList = new ArrayList<>();
+            department.getDepartmentServices().forEach(service -> {
+                servicesList.add(service.getService().getId());
+                servicesWorkloadList.add(service.getWorkload());
+            });
+            OptionalDouble workload = servicesWorkloadList.stream().mapToDouble(e -> e).average();
+            if (workload.isPresent()) {
+                System.out.println(
+                        departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList).getDepartment()
+                );
+                System.out.println(
+                        departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList).getWorkload()
+                );
+                return departmentMapper.toDto(department, departmentDto, workload.getAsDouble(), servicesList);
+            } else {
+                return departmentMapper.toDto(department, departmentDto, 0, servicesList);
+            }
+        }).collect(Collectors.toList());
     }
 
     @Transactional
