@@ -135,9 +135,22 @@ services:
         "department": "Московская улица, 101"
     }
     DELETE :8081/department/delete/10
+    POST :8081/service/create
     {
       "service": "Оформить карту"
     }
+    PATCH :8081/service/update/2 
+    {
+      "service": "Оформить карту"
+    }
+    DELETE :8081/service/delete/4
+    POST :8081/department_service/create {
+        "departmentId": 3,
+        "serviceId": 2,
+        "workload": 2.0
+    }
+    DELETE :8081/department_service/delete/8
+    
 
     
       
