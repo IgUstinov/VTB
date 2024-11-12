@@ -1,3 +1,6 @@
+Java-Backend составляющая для Flutter-Mobile приложения.
+https://github.com/anpoda-agency/vtb-hack 
+
 # VTB
 
 ЗАПУСК
